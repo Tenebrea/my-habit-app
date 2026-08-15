@@ -1,9 +1,9 @@
 package com.example.myhabitapp.data
 
 import androidx.room3.ColumnTypeConverter
+import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
-import java.time.DayOfWeek
 
 
 class Converters {

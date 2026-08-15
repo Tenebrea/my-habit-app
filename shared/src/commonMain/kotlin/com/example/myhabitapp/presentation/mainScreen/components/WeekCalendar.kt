@@ -1,5 +1,6 @@
 package com.example.myhabitapp.presentation.mainScreen.components
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -23,7 +24,10 @@ fun WeekCalendar(
     modifier: Modifier = Modifier,
     currentDay: LocalDate
 ) {
-    Row(modifier = modifier) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
         DayOfWeek.entries.forEach { dayOfWeek ->
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,

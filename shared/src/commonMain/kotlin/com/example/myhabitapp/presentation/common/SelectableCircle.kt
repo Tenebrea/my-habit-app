@@ -2,8 +2,11 @@ package com.example.myhabitapp.presentation.common
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,18 +23,27 @@ fun SelectableCircle(
     selected: Boolean,
     text: String
 ) {
-    Box(modifier
-        .clip(CircleShape)
-        .background(if (selected) MaterialTheme.colorScheme.onSurface
-        else MaterialTheme.colorScheme.surface),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = text,
-            style = MaterialTheme.typography.labelSmall,
-            color = if (selected) MaterialTheme.colorScheme.surface
-            else MaterialTheme.colorScheme.onSurface
-        )
+    Card(
+        elevation = CardDefaults.cardElevation(6.dp),
+        modifier = modifier.clip(CircleShape)
+
+    ){
+        Box(
+            Modifier
+                .background(
+                    if (selected) MaterialTheme.colorScheme.onSurface
+                    else MaterialTheme.colorScheme.surface)
+                .fillMaxSize()
+            ,
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = text,
+                style = MaterialTheme.typography.labelSmall,
+                color = if (selected) MaterialTheme.colorScheme.surface
+                else MaterialTheme.colorScheme.onSurface
+            )
+        }
     }
 }
 

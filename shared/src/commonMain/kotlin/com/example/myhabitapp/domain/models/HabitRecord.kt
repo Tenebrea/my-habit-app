@@ -20,8 +20,7 @@ data class HabitRecord(
     val id: Long,
     val date: LocalDate,
     @ColumnInfo(name = "completion_progress")
-    val completionProgress: Int?,
-    val completed: Boolean,
+    val completionProgress: Int,
     @ColumnInfo(name = "habit_id")
     val habitId: Int
 )

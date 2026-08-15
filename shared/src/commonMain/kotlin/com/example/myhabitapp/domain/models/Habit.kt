@@ -5,12 +5,9 @@ import androidx.room3.ColumnInfo
 import androidx.room3.Entity
 import androidx.room3.Ignore
 import androidx.room3.PrimaryKey
+import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
-import java.text.DateFormat
-import java.text.SimpleDateFormat
-import java.time.DayOfWeek
-import java.util.Date
 
 @Entity(tableName = "habit")
 data class Habit(
@@ -24,6 +21,8 @@ data class Habit(
     @ColumnInfo(name = "reminder_time")
     val reminderTime: LocalTime?,
     @ColumnInfo(name = "number_goal")
-    val numberGoal: Int?,
-    val color: Int
+    val numberGoal: Int,
+    val color: Int,
+    val icon: Int,
+    val streak: Int
 )
