@@ -40,6 +40,7 @@ kotlin {
             implementation(libs.compose.uiTooling)
             implementation(libs.androidx.room3.sqlite.wrapper)
             implementation(libs.androidx.room3.runtime.android)
+            api(libs.koin.core)
             implementation(libs.koin.android)
         }
         commonMain.dependencies {
@@ -51,6 +52,8 @@ kotlin {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
+            implementation(libs.navigation.compose)
+            implementation(libs.kotlinx.coroutines.core)
 
             implementation(libs.material.icons.core)
             implementation(libs.material.icons.extended)
@@ -58,13 +61,13 @@ kotlin {
             implementation(libs.androidx.room3.runtime)
             implementation(libs.androidx.sqlite.bundled)
 
-            implementation(project.dependencies.platform(libs.koin.bom))
-            implementation(libs.koin.core)
+            api(libs.koin.core)
             implementation(libs.koin.test)
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
 
             implementation(libs.kotlinx.datetime)
+            implementation(libs.adaptive.layout)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -79,4 +82,5 @@ dependencies {
     androidRuntimeClasspath(libs.compose.uiTooling)
 
     add("kspAndroid", libs.androidx.room3.compiler)
+    add("kspJvm", libs.androidx.room3.compiler)
 }

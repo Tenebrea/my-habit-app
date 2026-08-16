@@ -40,7 +40,6 @@ fun UserDetails(
     userName: String,
     image: Painter,
     date: LocalDate,
-    weekday: String,
     imageSize: Dp
 ) {
     Row(
@@ -54,7 +53,7 @@ fun UserDetails(
                 color = MaterialTheme.colorScheme.onBackground
             )
             Text(
-                text = "${ weekday.lowercase().replaceFirstChar{ it.uppercase() } }, " +
+                text = "${ date.dayOfWeek.name.lowercase().replaceFirstChar{ it.uppercase() } }, " +
                         date.day + " " +
                         date.month.name.lowercase().replaceFirstChar{ it.uppercase() } + " " +
                         date.year,
@@ -80,7 +79,6 @@ fun UserDetailsPreview() {
             userName = "My name",
             image = painterResource(Res.drawable.placeholder_image),
             date = LocalDate(2000, 11, 30),
-            weekday = DayOfWeek.SATURDAY.name,
             imageSize = 64.dp
         )
     }

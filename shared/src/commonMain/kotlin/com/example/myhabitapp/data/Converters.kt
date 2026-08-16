@@ -24,7 +24,7 @@ class Converters {
     @ColumnTypeConverter
     fun stringToDate(string: String): LocalDate {
         val list = listOf(*string.split("-").toTypedArray())
-        val date = kotlinx.datetime.LocalDate(
+        val date = LocalDate(
             list[0].toInt(),
             list[1].toInt(),
             list[2].toInt()

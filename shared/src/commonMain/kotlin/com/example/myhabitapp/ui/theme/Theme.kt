@@ -57,7 +57,7 @@ private val DarkColorScheme = darkColorScheme(
     tertiaryContainer = Brown,
     onTertiaryContainer = PinkLight,
 
-    background = Color(0xFF171412),
+    background = Color(0xFF2F2A26),
     onBackground = WarmWhite,
 
     surface = Color(0xFF0C0C0C),

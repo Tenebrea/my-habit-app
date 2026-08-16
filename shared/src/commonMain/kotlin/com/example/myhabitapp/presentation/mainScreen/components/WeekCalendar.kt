@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.example.myhabitapp.presentation.common.SelectableCircle
@@ -54,10 +55,23 @@ fun WeekCalendar(
     }
 }
 
-@PreviewLightDark
+@Preview(showBackground = true)
 @Composable
-fun WeekCalendarPreview() {
-    HabitAppTheme {
+fun LightWeekCalendarPreview() {
+    HabitAppTheme(darkTheme = false) {
+        WeekCalendar(
+            currentDay = LocalDate(2026, 1, 1)
+        )
+    }
+}
+
+@Preview(
+    showBackground = true,
+    backgroundColor = 0xFF2F2A26
+)
+@Composable
+fun DarkWeekCalendarPreview() {
+    HabitAppTheme(darkTheme = true) {
         WeekCalendar(
             currentDay = LocalDate(2026, 1, 1)
         )

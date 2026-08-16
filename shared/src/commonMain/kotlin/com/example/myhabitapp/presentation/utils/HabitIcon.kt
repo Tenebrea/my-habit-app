@@ -10,7 +10,6 @@ import androidx.compose.material.icons.outlined.SetMeal
 import androidx.compose.material.icons.outlined.Water
 import androidx.compose.ui.graphics.vector.ImageVector
 import myhabitapp.shared.generated.resources.Res
-import myhabitapp.shared.generated.resources.glass_cup
 import org.jetbrains.compose.resources.vectorResource
 
 

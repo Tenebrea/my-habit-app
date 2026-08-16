@@ -5,8 +5,8 @@ import com.example.myhabitapp.domain.models.HabitRecord
 import kotlinx.coroutines.flow.Flow
 
 interface HabitRepository {
-    fun getHabits(): Flow<List<Habit>>
-    fun getHabitRecordsByHabitId(id: Int): Flow<List<HabitRecord>>
+    suspend fun getHabits(): Flow<List<Habit>>
+    suspend fun getHabitRecordsByHabitId(id: Int): List<HabitRecord>
     suspend fun insertHabit(habit: Habit)
     suspend fun insertHabitRecord(habitRecord: HabitRecord)
     suspend fun deleteHabit(habit: Habit)

@@ -7,11 +7,11 @@ import com.example.myhabitapp.domain.repositories.HabitRepository
 import kotlinx.coroutines.flow.Flow
 
 class HabitRepositoryImpl(private val habitDao: HabitDao) : HabitRepository {
-    override fun getHabits(): Flow<List<Habit>> {
+    override suspend fun getHabits(): Flow<List<Habit>> {
         return habitDao.getHabits()
     }
 
-    override fun getHabitRecordsByHabitId(id: Int): Flow<List<HabitRecord>> {
+    override suspend fun getHabitRecordsByHabitId(id: Int): List<HabitRecord> {
         return habitDao.getHabitRecordsByHabitId(id)
     }
 
