@@ -2,7 +2,12 @@ package com.example.myhabitapp.presentation.mainScreen
 
 import com.example.myhabitapp.domain.models.Habit
 import com.example.myhabitapp.domain.models.HabitRecord
+import kotlinx.datetime.Clock
+import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toKotlinMonth
+import java.time.LocalDateTime
 import java.util.Date
 
 data class MainUiState(
@@ -11,7 +16,7 @@ data class MainUiState(
     val userName: String = ""
 )
 private fun getCurrentDate(): LocalDate {
-    val date = Date()
-    return LocalDate(date.year, date.month+1, date.day+1)
+    val today = LocalDateTime.now()
+    return LocalDate(today.year, today.month.toKotlinMonth(), today.dayOfMonth)
 }
 
