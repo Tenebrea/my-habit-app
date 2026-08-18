@@ -13,7 +13,8 @@ import java.util.Date
 data class MainUiState(
     val shownHabits: Map<Habit, HabitRecord?> = emptyMap(),
     val currentDate: LocalDate = getCurrentDate(),
-    val userName: String = ""
+    val userName: String = "",
+    val notificationsEnabled: Boolean = false
 )
 private fun getCurrentDate(): LocalDate {
     val today = LocalDateTime.now()

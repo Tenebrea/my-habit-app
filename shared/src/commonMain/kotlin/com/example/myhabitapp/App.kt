@@ -17,15 +17,13 @@ fun App(
         )
         when {
             screenSize
-                .isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND) -> {
-
-            }
-
-            screenSize
                 .isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_EXPANDED_LOWER_BOUND) -> {
 
             }
+            screenSize
+                .isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND) -> {
 
+            }
             else -> {
 
             }

@@ -1,5 +1,6 @@
 package com.example.myhabitapp.presentation.mainScreen
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -12,6 +13,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.myhabitapp.domain.models.Habit
 import com.example.myhabitapp.domain.models.HabitRecord
+import com.example.myhabitapp.presentation.mainScreen.components.EnableNotificationsReminder
 import com.example.myhabitapp.presentation.mainScreen.components.HabitList
 import com.example.myhabitapp.presentation.mainScreen.components.UserDetails
 import com.example.myhabitapp.presentation.mainScreen.components.WeekCalendar
@@ -25,14 +27,18 @@ fun MainHabitScreen(
     uiState: MainUiState,
     imageSize: Dp = 32.dp,
     increaseCompletionStatus: (Habit, HabitRecord?) -> Unit,
-    decreaseCompletionStatus: (Habit, HabitRecord?) -> Unit
+    decreaseCompletionStatus: (Habit, HabitRecord?) -> Unit,
+    enableNotifications: () -> Unit
 ) {
     Scaffold(
         floatingActionButton = {
 
         }
     ) { innerPadding ->
-        Column(modifier = modifier.padding(innerPadding)) {
+        Column(
+            modifier = modifier.padding(innerPadding),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
             UserDetails(
                 modifier = Modifier.fillMaxWidth(),
                 userName = uiState.userName,
@@ -44,6 +50,12 @@ fun MainHabitScreen(
                 modifier = Modifier.fillMaxWidth(),
                 currentDay = uiState.currentDate
             )
+            if (!uiState.notificationsEnabled) {
+                EnableNotificationsReminder(
+                    modifier = Modifier.fillMaxWidth(),
+                    enableNotifications = { enableNotifications() }
+                )
+            }
             Text(
                 text = "Daily routine",
                 style = MaterialTheme.typography.headlineLarge,
