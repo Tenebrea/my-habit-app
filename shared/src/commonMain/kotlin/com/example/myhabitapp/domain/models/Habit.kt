@@ -21,7 +21,7 @@ data class Habit(
     @ColumnInfo(name = "reminder_time")
     val reminderTime: LocalTime?,
     @ColumnInfo(name = "number_goal")
-    val numberGoal: Int,
+    val numberGoal: Int?,
     val color: Int,
     val icon: Int,
     val streak: Int

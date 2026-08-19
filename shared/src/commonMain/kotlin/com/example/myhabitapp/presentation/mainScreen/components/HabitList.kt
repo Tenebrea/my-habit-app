@@ -83,7 +83,7 @@ fun HabitListItem(
     ) {
         val checked = when {
             habitRecord == null -> false
-            habitRecord.completionProgress >= habit.numberGoal -> true
+            habitRecord.completionProgress >= (habit.numberGoal ?: 1) -> true
             else -> false
         }
         val color = HabitColor.entries[habit.color].color

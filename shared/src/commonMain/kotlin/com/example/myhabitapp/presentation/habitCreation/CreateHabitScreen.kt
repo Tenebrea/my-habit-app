@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -25,14 +27,19 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.example.myhabitapp.presentation.common.SelectableCircle
+import com.example.myhabitapp.presentation.habitCreation.components.SetDateDialog
+import com.example.myhabitapp.presentation.habitCreation.components.SetReminderDialog
+import com.example.myhabitapp.ui.theme.HabitAppTheme
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import myhabitapp.shared.generated.resources.Res
@@ -44,14 +51,17 @@ fun EditCreateHabitScreen(
     modifier: Modifier = Modifier,
     uiState: CreateHabitUiState,
     onNameChanged: (String) -> Unit,
-    onDateChanged: (LocalDate) -> Unit,
+    onDateChanged: (Long?) -> Unit,
+    onReminderChanged: (TimePickerState) -> Unit,
     onGoalAmountChanged: (Int) -> Unit,
     onToggleWeekDay: (DayOfWeek) -> Unit,
     toggleSetGoal: (Boolean) -> Unit,
     toggleRepeatDays: (Boolean) -> Unit,
     toggleGetReminders: (Boolean) -> Unit,
     showDateDialogPicker: () -> Unit,
-    onSaveHabit: () -> Unit
+    onSaveHabit: () -> Unit,
+    onDismissDateDialog: () -> Unit,
+    onDismissTimeDialog: () -> Unit
 ) {
     Column(modifier = modifier) {
         Text(
@@ -82,32 +92,42 @@ fun EditCreateHabitScreen(
             elevation = CardDefaults.cardElevation(6.dp),
             modifier = Modifier.fillMaxWidth()
         ){
-            TextField(
-                value = uiState.habitName,
-                onValueChange = { onNameChanged(it) },
-                singleLine = true,
-                shape = RoundedCornerShape(24.dp),
-                colors = TextFieldDefaults.colors(
-                    focusedTextColor = MaterialTheme.colorScheme.onSurface,
-                    unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
-                    focusedContainerColor = MaterialTheme.colorScheme.surface,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.surface
-                ),
-                textStyle = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.fillMaxWidth()
-            )
-            if (uiState.habitName == "") {
+            Box(contentAlignment = Alignment.CenterStart){
+                TextField(
+                    value = uiState.habitName,
+                    onValueChange = { onNameChanged(it) },
+                    singleLine = true,
+                    shape = RoundedCornerShape(24.dp),
+                    colors = TextFieldDefaults.colors(
+                        focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                        unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                        focusedContainerColor = MaterialTheme.colorScheme.surface,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surface
+                    ),
+                    textStyle = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                if (uiState.habitName == "") {
+                    Text(
+                        text = "Habit name",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+                        modifier = Modifier.padding(start = 16.dp)
+                    )
+                }
+            }
+            if (uiState.emptyNameError) {
                 Text(
-                    text = "Habit name",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
-                    modifier = Modifier.padding(4.dp)
+                    text = "Name your habit",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error
                 )
             }
         }
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ){
             Text(
                 text = "Set a goal",
@@ -120,7 +140,10 @@ fun EditCreateHabitScreen(
                 onCheckedChange = { toggleSetGoal(!it) }
             )
         }
-        Row(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
             Card(
                 elevation = CardDefaults.cardElevation(6.dp),
                 modifier = Modifier
@@ -128,31 +151,33 @@ fun EditCreateHabitScreen(
                     .clickable(onClick = { showDateDialogPicker() })
                     .semantics { if (uiState.endDate == null) contentDescription = "Pick end date" }
             ){
-                TextField(
-                    value = uiState.habitName,
-                    onValueChange = {},
-                    singleLine = true,
-                    shape = RoundedCornerShape(24.dp),
-                    colors = TextFieldDefaults.colors(
-                        disabledTextColor = MaterialTheme.colorScheme.onSurface,
-                        disabledContainerColor = MaterialTheme.colorScheme.surface
-                    ),
-                    modifier = Modifier.fillMaxWidth(),
-                    enabled = false,
-                    trailingIcon = {
-                        Icon(
-                            imageVector = Icons.Outlined.EditCalendar,
-                            contentDescription = null
+                Box(contentAlignment = Alignment.CenterStart) {
+                    TextField(
+                        value = uiState.habitName,
+                        onValueChange = {},
+                        singleLine = true,
+                        shape = RoundedCornerShape(24.dp),
+                        colors = TextFieldDefaults.colors(
+                            disabledTextColor = MaterialTheme.colorScheme.onSurface,
+                            disabledContainerColor = MaterialTheme.colorScheme.surface
+                        ),
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = false,
+                        trailingIcon = {
+                            Icon(
+                                imageVector = Icons.Outlined.EditCalendar,
+                                contentDescription = null
+                            )
+                        }
+                    )
+                    if (uiState.endDate == null) {
+                        Text(
+                            text = "Add date",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+                            modifier = Modifier.padding(start = 16.dp)
                         )
                     }
-                )
-                if (uiState.endDate == null) {
-                    Text(
-                        text = "Add date",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
-                        modifier = Modifier.padding(4.dp)
-                    )
                 }
             }
             Card(
@@ -160,32 +185,42 @@ fun EditCreateHabitScreen(
                 modifier = Modifier
                     .weight(1f)
             ){
-                TextField(
-                    value = if (uiState.goalNumber != null) uiState.goalNumber.toString() else "",
-                    onValueChange = { onGoalAmountChanged(it.toInt()) },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                    shape = RoundedCornerShape(24.dp),
-                    colors = TextFieldDefaults.colors(
-                        disabledTextColor = MaterialTheme.colorScheme.onSurface,
-                        disabledContainerColor = MaterialTheme.colorScheme.surface
-                    ),
-                    modifier = Modifier.fillMaxWidth(),
-                    enabled = false
-                )
-                if (uiState.goalNumber == null) {
-                    Text(
-                        text = "Add amount",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
-                        modifier = Modifier.padding(4.dp)
+                Box(contentAlignment = Alignment.CenterStart) {
+                    TextField(
+                        value = if (uiState.goalNumber != null) uiState.goalNumber.toString() else "",
+                        onValueChange = { onGoalAmountChanged(it.toInt()) },
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                        shape = RoundedCornerShape(24.dp),
+                        colors = TextFieldDefaults.colors(
+                            disabledTextColor = MaterialTheme.colorScheme.onSurface,
+                            disabledContainerColor = MaterialTheme.colorScheme.surface
+                        ),
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = false
                     )
+                    if (uiState.goalNumber == null) {
+                        Text(
+                            text = "Add amount",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+                            modifier = Modifier.padding(start = 16.dp)
+                        )
+                    }
                 }
             }
         }
+        if (uiState.emptyGoalsError) {
+            Text(
+                text = "Set a goal",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.error
+            )
+        }
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ){
             Text(
                 text = "Set a goal",
@@ -200,19 +235,30 @@ fun EditCreateHabitScreen(
         }
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             DayOfWeek.entries.forEach { dayOfWeek ->
                 SelectableCircle(
-                    modifier = Modifier.clickable(onClick = { onToggleWeekDay(dayOfWeek) }),
+                    modifier = Modifier
+                        .clickable(onClick = { onToggleWeekDay(dayOfWeek) })
+                        .size(48.dp),
                     selected = dayOfWeek in uiState.repeatDays,
-                    text = dayOfWeek.name[0].toString()
+                    text = dayOfWeek.name[0].toString(),
+                    disabled = !uiState.repeatable
                 )
             }
         }
+        if (uiState.emptyRepeatDaysError) {
+            Text(
+                text = "Select repeat days",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.error
+            )
+        }
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 text = "Get reminders",
@@ -234,14 +280,52 @@ fun EditCreateHabitScreen(
         Button(
             onClick = { onSaveHabit() },
             shape = RoundedCornerShape(45.dp),
-            colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primaryContainer),
+            colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(
                 text = "Save Habit",
                 style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
+                color = MaterialTheme.colorScheme.onPrimary
             )
         }
+    }
+    if (uiState.dateDialogShown) {
+        SetDateDialog(
+            modifier = Modifier,
+            date = uiState.endDate,
+            onDismiss = onDismissDateDialog,
+            onDateSelected = { onDateChanged(it) }
+        )
+    }
+    if (uiState.reminderDialogShown) {
+        SetReminderDialog(
+            modifier = Modifier,
+            onDismiss = onDismissTimeDialog,
+            onConfirm = { onReminderChanged(it) }
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+fun CreateHabitScreenPreview() {
+    HabitAppTheme {
+        EditCreateHabitScreen(
+            modifier = Modifier.width(400.dp),
+            uiState = CreateHabitUiState(),
+            onNameChanged = { },
+            onDateChanged = { },
+            onGoalAmountChanged = { },
+            onToggleWeekDay = { },
+            toggleSetGoal = { },
+            toggleRepeatDays = { },
+            toggleGetReminders = { },
+            showDateDialogPicker = { },
+            onSaveHabit = { },
+            onReminderChanged = {  },
+            onDismissDateDialog = {  },
+            onDismissTimeDialog = {  }
+        )
     }
 }
