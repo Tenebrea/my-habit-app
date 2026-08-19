@@ -3,22 +3,31 @@ package com.example.myhabitapp.presentation.habitCreation
 import androidx.compose.material3.TimePickerState
 import androidx.compose.material3.isInputValid
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.room3.ColumnInfo
 import com.example.myhabitapp.domain.models.Habit
 import com.example.myhabitapp.domain.repositories.HabitRepository
+import com.example.myhabitapp.presentation.utils.HabitColor
+import com.example.myhabitapp.presentation.utils.HabitIcon
 import com.example.myhabitapp.presentation.utils.toLocalDate
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
+import kotlin.Boolean
+import kotlin.Int
 import kotlin.String
 
 class HabitCreationViewModel(
     val habit: Habit?,
     val repository: HabitRepository
 ) : ViewModel() {
-    private val _uiState: MutableStateFlow<CreateHabitUiState> = MutableStateFlow(CreateHabitUiState())
+    private val _uiState: MutableStateFlow<CreateHabitUiState> =
+        MutableStateFlow(CreateHabitUiState())
     val uiState = _uiState.asStateFlow()
 
     init {
@@ -46,7 +55,8 @@ class HabitCreationViewModel(
             )
         }
     }
-    fun onDateChanged(newDate: Long?){
+
+    fun onDateChanged(newDate: Long?) {
         if (newDate != null) {
             val date = newDate.toLocalDate()
             _uiState.update {
@@ -57,6 +67,7 @@ class HabitCreationViewModel(
             onDismissDateDialog()
         }
     }
+
     fun onReminderChanged(newReminder: TimePickerState) {
         if (newReminder.isInputValid) {
             val time = LocalTime(hour = newReminder.hour, minute = newReminder.minute)
@@ -68,6 +79,7 @@ class HabitCreationViewModel(
             }
         }
     }
+
     fun onGoalAmountChanged(newGoalAmount: Int) {
         _uiState.update {
             it.copy(
@@ -75,6 +87,7 @@ class HabitCreationViewModel(
             )
         }
     }
+
     fun onToggleWeekDay(day: DayOfWeek) {
         if (day in _uiState.value.repeatDays) {
             val newList = _uiState.value
@@ -98,6 +111,7 @@ class HabitCreationViewModel(
             }
         }
     }
+
     fun toggleSetGoal(newState: Boolean) {
         _uiState.update {
             it.copy(
@@ -105,6 +119,7 @@ class HabitCreationViewModel(
             )
         }
     }
+
     fun toggleRepeatDays(newState: Boolean) {
         _uiState.update {
             it.copy(
@@ -112,6 +127,7 @@ class HabitCreationViewModel(
             )
         }
     }
+
     fun toggleGetReminders(newState: Boolean) {
         _uiState.update {
             it.copy(
@@ -120,6 +136,7 @@ class HabitCreationViewModel(
             )
         }
     }
+
     fun showDateDialogPicker() {
         _uiState.update {
             it.copy(
@@ -127,9 +144,60 @@ class HabitCreationViewModel(
             )
         }
     }
-    fun onSaveHabit() {
 
+    fun onSaveHabit() {
+        var nameError = false
+        var goalError = false
+        var repeatError = false
+
+        if (_uiState.value.habitName == "") {
+            nameError = true
+        }
+        if (
+            _uiState.value.goalEnabled &&
+            _uiState.value.goalNumber == null &&
+            _uiState.value.endDate == null
+        ) {
+            goalError = true
+        }
+        if (
+            _uiState.value.repeatDays.isEmpty() &&
+            _uiState.value.repeatable
+        ) {
+            repeatError = true
+        }
+        if (nameError || goalError || repeatError) {
+            _uiState.update {
+                it.copy(
+                    emptyNameError = nameError,
+                    emptyGoalsError = goalError,
+                    emptyRepeatDaysError = repeatError
+                )
+            }
+        } else {
+            val newHabit = habit?.copy(
+                name = _uiState.value.habitName,
+                endDate = _uiState.value.endDate,
+                repeatDays = _uiState.value.repeatDays,
+                reminderTime = _uiState.value.reminder,
+                numberGoal = _uiState.value.goalNumber,
+            ) ?: Habit(
+                id = 0,
+                name = _uiState.value.habitName,
+                endDate = _uiState.value.endDate,
+                repeatDays = _uiState.value.repeatDays,
+                reminderTime = _uiState.value.reminder,
+                numberGoal = _uiState.value.goalNumber,
+                color = HabitColor.entries.random().ordinal,
+                icon = HabitIcon.entries.random().ordinal,
+                streak = 0
+            )
+
+            viewModelScope
+                .launch(Dispatchers.IO) { repository.insertHabit(newHabit) }
+        }
     }
+
     fun onDismissDateDialog() {
         _uiState.update {
             it.copy(
@@ -137,6 +205,7 @@ class HabitCreationViewModel(
             )
         }
     }
+
     fun onDismissTimeDialog() {
         _uiState.update {
             it.copy(
