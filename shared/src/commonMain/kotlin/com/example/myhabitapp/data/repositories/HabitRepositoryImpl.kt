@@ -15,6 +15,14 @@ class HabitRepositoryImpl(private val habitDao: HabitDao) : HabitRepository {
         return habitDao.getHabitRecordsByHabitId(id)
     }
 
+    override suspend fun getHabitById(habitId: Int?): Habit? {
+        if (habitId == null) {
+            return null
+        } else {
+            return habitDao.getHabitById(habitId)
+        }
+    }
+
     override suspend fun insertHabit(habit: Habit) {
         habitDao.insertHabit(habit)
     }

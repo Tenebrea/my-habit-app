@@ -51,6 +51,7 @@ fun HabitList(
     habits: Map<Habit, HabitRecord?>,
     increaseCompletionStatus: (Habit, HabitRecord?) -> Unit,
     decreaseCompletionStatus: (Habit, HabitRecord?) -> Unit,
+    editHabit: (Int) -> Unit
 ) {
     LazyColumn(
         modifier = modifier,
@@ -62,7 +63,8 @@ fun HabitList(
                 increaseCompletionStatus = { increaseCompletionStatus(habit, habits[habit]) },
                 decreaseCompletionStatus = { decreaseCompletionStatus(habit, habits[habit]) },
                 habit = habit,
-                habitRecord = habits[habit]
+                habitRecord = habits[habit],
+                editHabit = editHabit
             )
         }
     }
@@ -74,7 +76,8 @@ fun HabitListItem(
     increaseCompletionStatus: () -> Unit,
     decreaseCompletionStatus: () -> Unit,
     habit: Habit,
-    habitRecord: HabitRecord?
+    habitRecord: HabitRecord?,
+    editHabit: (Int) -> Unit
 ) {
     Row(
         modifier = modifier,
@@ -119,7 +122,11 @@ fun HabitListItem(
                         .background(color.copy(alpha = 0.5F))
                         .padding(4.dp)
                 )
-                Column(modifier = Modifier.weight(1f)) {
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable(onClick = { editHabit(habit.id) })
+                ) {
                     Text(
                         text = habit.name,
                         style = MaterialTheme.typography.labelLarge,
@@ -190,6 +197,7 @@ fun ListItemPreview() {
                 completionProgress = 3,
                 habitId = 1
             ),
+            editHabit = {},
             modifier = Modifier.padding(4.dp).width(500.dp)
         )
     }
@@ -251,6 +259,7 @@ private fun HabitListPreview() {
             habits = habits,
             increaseCompletionStatus = { _, _ -> },
             decreaseCompletionStatus = { _, _ -> },
+            editHabit = {},
             modifier = Modifier
         )
     }

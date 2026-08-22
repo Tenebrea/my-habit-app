@@ -17,6 +17,9 @@ interface HabitDao {
     @Query("SELECT * FROM habit_record WHERE habit_id = :id")
     suspend fun getHabitRecordsByHabitId(id: Int): List<HabitRecord>
 
+    @Query("SELECT * FROM habit WHERE id = :id")
+    suspend fun getHabitById(id: Int): Habit
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertHabit(habit: Habit)
 

@@ -4,6 +4,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PlusOne
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -28,45 +32,41 @@ fun MainHabitScreen(
     imageSize: Dp = 32.dp,
     increaseCompletionStatus: (Habit, HabitRecord?) -> Unit,
     decreaseCompletionStatus: (Habit, HabitRecord?) -> Unit,
-    enableNotifications: () -> Unit
+    enableNotifications: () -> Unit,
+    editHabit: (Int) -> Unit
 ) {
-    Scaffold(
-        floatingActionButton = {
-
-        }
-    ) { innerPadding ->
-        Column(
-            modifier = modifier.padding(innerPadding),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            UserDetails(
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        UserDetails(
+            modifier = Modifier.fillMaxWidth(),
+            userName = uiState.userName,
+            image = painterResource(Res.drawable.placeholder_image),
+            date = uiState.currentDate,
+            imageSize = imageSize
+        )
+        WeekCalendar(
+            modifier = Modifier.fillMaxWidth(),
+            currentDay = uiState.currentDate
+        )
+        if (!uiState.notificationsEnabled) {
+            EnableNotificationsReminder(
                 modifier = Modifier.fillMaxWidth(),
-                userName = uiState.userName,
-                image = painterResource(Res.drawable.placeholder_image),
-                date = uiState.currentDate,
-                imageSize = imageSize
-            )
-            WeekCalendar(
-                modifier = Modifier.fillMaxWidth(),
-                currentDay = uiState.currentDate
-            )
-            if (!uiState.notificationsEnabled) {
-                EnableNotificationsReminder(
-                    modifier = Modifier.fillMaxWidth(),
-                    enableNotifications = { enableNotifications() }
-                )
-            }
-            Text(
-                text = "Daily routine",
-                style = MaterialTheme.typography.headlineLarge,
-                color = MaterialTheme.colorScheme.onBackground
-            )
-            HabitList(
-                modifier = Modifier.fillMaxWidth(),
-                habits = uiState.shownHabits,
-                increaseCompletionStatus = { habit, record -> increaseCompletionStatus(habit, record) },
-                decreaseCompletionStatus = { habit, record -> decreaseCompletionStatus(habit, record) }
+                enableNotifications = { enableNotifications() }
             )
         }
+        Text(
+            text = "Daily routine",
+            style = MaterialTheme.typography.headlineLarge,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+        HabitList(
+            modifier = Modifier.fillMaxWidth(),
+            habits = uiState.shownHabits,
+            increaseCompletionStatus = { habit, record -> increaseCompletionStatus(habit, record) },
+            decreaseCompletionStatus = { habit, record -> decreaseCompletionStatus(habit, record) },
+            editHabit = editHabit
+        )
     }
 }

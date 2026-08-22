@@ -137,7 +137,7 @@ fun EditCreateHabitScreen(
             )
             Checkbox(
                 checked = uiState.goalEnabled,
-                onCheckedChange = { toggleSetGoal(!it) }
+                onCheckedChange = { toggleSetGoal(it) }
             )
         }
         Row(
@@ -153,7 +153,9 @@ fun EditCreateHabitScreen(
             ){
                 Box(contentAlignment = Alignment.CenterStart) {
                     TextField(
-                        value = uiState.habitName,
+                        value =
+                            if (uiState.endDate != null) "${uiState.endDate.day} ${uiState.endDate.month.name} ${uiState.endDate.year}"
+                            else "",
                         onValueChange = {},
                         singleLine = true,
                         shape = RoundedCornerShape(24.dp),
@@ -223,7 +225,7 @@ fun EditCreateHabitScreen(
             verticalAlignment = Alignment.CenterVertically
         ){
             Text(
-                text = "Set a goal",
+                text = "Repeatable",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onBackground,
                 maxLines = 1

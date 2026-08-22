@@ -2,6 +2,9 @@ package com.example.myhabitapp.presentation.habitCreation
 
 import androidx.compose.material3.TimePickerState
 import androidx.compose.material3.isInputValid
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.room3.ColumnInfo
@@ -23,26 +26,30 @@ import kotlin.Int
 import kotlin.String
 
 class HabitCreationViewModel(
-    val habit: Habit?,
-    val repository: HabitRepository
+    val repository: HabitRepository,
+    val habitId: Int?,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<CreateHabitUiState> =
         MutableStateFlow(CreateHabitUiState())
     val uiState = _uiState.asStateFlow()
+    private val habit = mutableStateOf<Habit?>(null)
 
     init {
-        if (habit != null) {
-            _uiState.update {
-                it.copy(
-                    habitName = habit.name,
-                    goalEnabled = habit.numberGoal != null,
-                    endDate = habit.endDate,
-                    goalNumber = habit.numberGoal,
-                    repeatable = habit.repeatDays.isNotEmpty(),
-                    repeatDays = habit.repeatDays,
-                    getReminders = habit.reminderTime != null,
-                    createNote = false
-                )
+        viewModelScope.launch {
+            habit.value = repository.getHabitById(habitId)
+            habit.value?.let { it1 ->
+                _uiState.update {
+                    it.copy(
+                        habitName = it1.name,
+                        goalEnabled = it1.numberGoal != null,
+                        endDate = it1.endDate,
+                        goalNumber = it1.numberGoal,
+                        repeatable = it1.repeatDays.isNotEmpty(),
+                        repeatDays = it1.repeatDays,
+                        getReminders = it1.reminderTime != null,
+                        createNote = false
+                    )
+                }
             }
         }
     }
@@ -175,7 +182,7 @@ class HabitCreationViewModel(
                 )
             }
         } else {
-            val newHabit = habit?.copy(
+            val newHabit = habit.value?.copy(
                 name = _uiState.value.habitName,
                 endDate = _uiState.value.endDate,
                 repeatDays = _uiState.value.repeatDays,

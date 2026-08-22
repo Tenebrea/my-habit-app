@@ -1,5 +1,9 @@
 package com.example.myhabitapp.navigation
 
-enum class NavRoutes {
-    Main, Create, Stats
+import kotlinx.serialization.Serializable
+
+sealed class NavRoutes {
+    @Serializable object Main: NavRoutes()
+    @Serializable object Create: NavRoutes()
+    @Serializable data class Edit(val habitId: Int): NavRoutes()
 }
