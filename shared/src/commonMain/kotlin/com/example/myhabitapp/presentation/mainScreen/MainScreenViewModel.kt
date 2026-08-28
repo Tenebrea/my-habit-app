@@ -24,7 +24,13 @@ class MainScreenViewModel(
                 .getHabits()
                 .map { habits ->
                     habits.associateWith { habit ->
-                        repository.getHabitRecordsByHabitId(habit.id).maxBy { it.date }
+                        val result: List<HabitRecord> =
+                            repository.getHabitRecordsByHabitId(habit.id)
+                        if (result == emptyList<HabitRecord>()) {
+                            null
+                        } else {
+                            result.maxBy { it.date }
+                        }
                     }
                 }
                 .collect { habits ->
@@ -66,8 +72,11 @@ class MainScreenViewModel(
         habitRecord: HabitRecord?
     ) {
         if (habitRecord != null) {
+            if (habitRecord.completionProgress <= 0) {
+                return
+            }
             val newHabitRecord = habitRecord
-                .copy(completionProgress = habitRecord.completionProgress + 1)
+                .copy(completionProgress = habitRecord.completionProgress - 1)
             val newShownHabits = _uiState.value.shownHabits.toMutableMap()
             newShownHabits[habit] = newHabitRecord
             _uiState.update {

@@ -4,12 +4,22 @@ import androidx.room3.ColumnTypeConverter
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
+import kotlinx.datetime.Month
 
 
 class Converters {
     @ColumnTypeConverter
     fun stringToList(string: String): List<DayOfWeek> {
-        return listOf(*string.split(",").map { DayOfWeek.valueOf(it) }.toTypedArray())
+        if (string == "") {
+            return emptyList<DayOfWeek>()
+        } else {
+            return listOf(
+                *string
+                    .split(",")
+                    .map { day -> DayOfWeek.valueOf(day) }
+                    .toTypedArray()
+            )
+        }
     }
     @ColumnTypeConverter
     fun listToString(list: List<DayOfWeek>): String {
@@ -25,9 +35,9 @@ class Converters {
     fun stringToDate(string: String): LocalDate {
         val list = listOf(*string.split("-").toTypedArray())
         val date = LocalDate(
-            list[0].toInt(),
-            list[1].toInt(),
-            list[2].toInt()
+            year = list[0].toInt(),
+            month = Month.valueOf(list[1]),
+            day = list[2].toInt()
         )
         return date
     }

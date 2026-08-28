@@ -1,7 +1,9 @@
 package com.example.myhabitapp.navigation
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -23,13 +25,16 @@ fun HabitNavGraph(
     NavHost(
         navController = navController,
         startDestination = NavRoutes.Main,
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = MaterialTheme.colorScheme.background)
     ) {
         composable<NavRoutes.Main> {
             MainHabitRoute(
                 imageSize = 32.dp,
                 onAddHabit = { navController.navigate(NavRoutes.Create) },
                 onEditHabit = { habitId -> navController.navigate(NavRoutes.Edit(habitId)) },
+                viewModel = koinViewModel(),
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(8.dp)

@@ -21,7 +21,7 @@ fun EditCreateHabitRoute(
     Box(
         modifier = modifier,
         contentAlignment = Alignment.TopEnd
-    ){
+    ) {
         CloseButton(
             modifier = Modifier.size(48.dp),
             onClick = { onBack() }
@@ -38,7 +38,12 @@ fun EditCreateHabitRoute(
             toggleRepeatDays = { viewModel.toggleRepeatDays(it) },
             toggleGetReminders = { viewModel.toggleGetReminders(it) },
             showDateDialogPicker = { viewModel.showDateDialogPicker() },
-            onSaveHabit = { viewModel.onSaveHabit() },
+            onSaveHabit = {
+                viewModel.onSaveHabit()
+                if (!uiState.emptyNameError || !uiState.emptyRepeatDaysError || !uiState.emptyGoalsError) {
+                    onBack()
+                }
+            },
             onDismissDateDialog = { viewModel.onDismissDateDialog() },
             onDismissTimeDialog = { viewModel.onDismissTimeDialog() }
         )

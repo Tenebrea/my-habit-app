@@ -36,7 +36,7 @@ fun App(
 
             screenSize
                 .isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND) -> {
-                    var route: NavRoutes? by remember { mutableStateOf(NavRoutes.Main) }
+                var route: NavRoutes? by remember { mutableStateOf(NavRoutes.Main) }
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -46,11 +46,13 @@ fun App(
                         imageSize = 32.dp,
                         onAddHabit = { route = NavRoutes.Create },
                         onEditHabit = { habitId -> route = NavRoutes.Edit(habitId) },
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        viewModel = koinViewModel()
                     )
                     when (route) {
                         is NavRoutes.Create -> {
-                            val viewModel: HabitCreationViewModel = koinViewModel { parametersOf(null) }
+                            val viewModel: HabitCreationViewModel =
+                                koinViewModel { parametersOf(null) }
                             EditCreateHabitRoute(
                                 viewModel = viewModel,
                                 onBack = { route = null },
@@ -59,8 +61,10 @@ fun App(
                                     .padding(start = 12.dp)
                             )
                         }
+
                         is NavRoutes.Edit -> {
-                            val viewModel: HabitCreationViewModel = koinViewModel { parametersOf((route as NavRoutes.Edit).habitId) }
+                            val viewModel: HabitCreationViewModel =
+                                koinViewModel { parametersOf((route as NavRoutes.Edit).habitId) }
                             EditCreateHabitRoute(
                                 viewModel = viewModel,
                                 onBack = { route = null },
@@ -69,12 +73,14 @@ fun App(
                                     .padding(start = 12.dp)
                             )
                         }
+
                         else -> {
 
                         }
                     }
                 }
             }
+
             else -> {
                 HabitNavGraph()
             }

@@ -13,5 +13,6 @@ fun getHabitDb(context: Context): HabitDb {
         name = dbFile.absolutePath
     )
         .setDriver(BundledSQLiteDriver())
+        .addMigrations(MIGRATION_1_2)
         .build()
 }

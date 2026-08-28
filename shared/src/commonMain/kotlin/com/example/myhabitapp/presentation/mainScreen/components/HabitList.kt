@@ -159,7 +159,7 @@ fun HabitListItem(
                     )
                     HorizontalDivider(modifier = Modifier.width(24.dp))
                     Text(
-                        text = habit.numberGoal.toString(),
+                        text = "${habit.numberGoal ?: 1}",
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier
@@ -186,7 +186,7 @@ fun ListItemPreview() {
                 endDate = null,
                 repeatDays = listOf(DayOfWeek.THURSDAY),
                 reminderTime = null,
-                numberGoal = 4,
+                numberGoal = null,
                 color = 2,
                 icon = 2,
                 streak = 2

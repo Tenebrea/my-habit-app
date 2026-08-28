@@ -3,6 +3,7 @@ package com.example.myhabitapp.presentation.mainScreen
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlusOne
@@ -52,7 +53,9 @@ fun MainHabitScreen(
         )
         if (!uiState.notificationsEnabled) {
             EnableNotificationsReminder(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(192.dp),
                 enableNotifications = { enableNotifications() }
             )
         }

@@ -202,6 +202,24 @@ class HabitCreationViewModel(
 
             viewModelScope
                 .launch(Dispatchers.IO) { repository.insertHabit(newHabit) }
+            _uiState.update {
+                it.copy(
+                    habitName = "",
+                    goalEnabled = false,
+                    endDate = null,
+                    goalNumber = null,
+                    reminder = null,
+                    repeatable = false,
+                    repeatDays = emptyList(),
+                    getReminders = false,
+                    createNote = true,
+                    dateDialogShown = false,
+                    reminderDialogShown = false,
+                    emptyNameError = false,
+                    emptyGoalsError = false,
+                    emptyRepeatDaysError = false
+                )
+            }
         }
     }
 

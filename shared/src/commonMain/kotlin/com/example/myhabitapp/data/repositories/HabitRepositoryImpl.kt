@@ -7,7 +7,7 @@ import com.example.myhabitapp.domain.repositories.HabitRepository
 import kotlinx.coroutines.flow.Flow
 
 class HabitRepositoryImpl(private val habitDao: HabitDao) : HabitRepository {
-    override suspend fun getHabits(): Flow<List<Habit>> {
+    override fun getHabits(): Flow<List<Habit>> {
         return habitDao.getHabits()
     }
 
