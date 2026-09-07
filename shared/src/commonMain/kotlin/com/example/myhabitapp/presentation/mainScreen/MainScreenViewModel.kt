@@ -11,6 +11,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.minus
+import kotlinx.datetime.plus
 
 class MainScreenViewModel(
     val repository: HabitRepository
@@ -26,11 +29,7 @@ class MainScreenViewModel(
                     habits.associateWith { habit ->
                         val result: List<HabitRecord> =
                             repository.getHabitRecordsByHabitId(habit.id)
-                        if (result == emptyList<HabitRecord>()) {
-                            null
-                        } else {
-                            result.maxBy { it.date }
-                        }
+                        result.find { it.date == _uiState.value.currentDate }
                     }
                 }
                 .collect { habits ->
@@ -55,8 +54,7 @@ class MainScreenViewModel(
                 completionProgress = 1,
                 habitId = habit.id
             )
-        val newShownHabits = _uiState.value.shownHabits.toMutableMap()
-        newShownHabits[habit] = newHabitRecord
+        val newShownHabits = _uiState.value.shownHabits + (habit to newHabitRecord)
         _uiState.update {
             it.copy(
                 shownHabits = newShownHabits
@@ -64,6 +62,7 @@ class MainScreenViewModel(
         }
         viewModelScope.launch(Dispatchers.IO) {
             repository.insertHabitRecord(newHabitRecord)
+            if ((habit.numberGoal ?: 1) == newHabitRecord.completionProgress) addStreak(habit)
         }
     }
 
@@ -71,22 +70,38 @@ class MainScreenViewModel(
         habit: Habit,
         habitRecord: HabitRecord?
     ) {
-        if (habitRecord != null) {
-            if (habitRecord.completionProgress <= 0) {
-                return
+        if (habitRecord == null) return
+
+        if (habitRecord.completionProgress <= 0) {
+            return
+        }
+        val newHabitRecord = habitRecord
+            .copy(completionProgress = habitRecord.completionProgress - 1)
+        val newShownHabits = _uiState.value.shownHabits + (habit to newHabitRecord)
+        _uiState.update {
+            it.copy(
+                shownHabits = newShownHabits
+            )
+        }
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.insertHabitRecord(newHabitRecord)
+            if ((habit.numberGoal ?: 1) - 1 == newHabitRecord.completionProgress) {
+                undoStreak(habit)
             }
-            val newHabitRecord = habitRecord
-                .copy(completionProgress = habitRecord.completionProgress - 1)
-            val newShownHabits = _uiState.value.shownHabits.toMutableMap()
-            newShownHabits[habit] = newHabitRecord
-            _uiState.update {
-                it.copy(
-                    shownHabits = newShownHabits
-                )
-            }
-            viewModelScope.launch(Dispatchers.IO) {
-                repository.insertHabitRecord(newHabitRecord)
-            }
+        }
+    }
+
+    private suspend fun addStreak(habit: Habit) {
+        val newHabit = habit.copy(streak = habit.streak+1)
+        repository.insertHabit(newHabit)
+    }
+
+    private suspend fun undoStreak(habit: Habit) {
+        val lastRecord = repository.getHabitRecordsByHabitId(habit.id).maxByOrNull { it.date }
+        if (lastRecord == null) return
+
+        if (lastRecord.date == _uiState.value.currentDate && habit.streak > 0) {
+            repository.insertHabit(habit.copy(streak = habit.streak-1))
         }
     }
 }

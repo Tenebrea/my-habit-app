@@ -16,7 +16,7 @@ data class MainUiState(
     val userName: String = "",
     val notificationsEnabled: Boolean = false
 )
-private fun getCurrentDate(): LocalDate {
+fun getCurrentDate(): LocalDate {
     val today = LocalDateTime.now()
     return LocalDate(today.year, today.month.toKotlinMonth(), today.dayOfMonth)
 }
