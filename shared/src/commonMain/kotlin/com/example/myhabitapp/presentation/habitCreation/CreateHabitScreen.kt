@@ -34,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.example.myhabitapp.presentation.common.SelectableCircle
@@ -41,7 +42,6 @@ import com.example.myhabitapp.presentation.habitCreation.components.SetDateDialo
 import com.example.myhabitapp.presentation.habitCreation.components.SetReminderDialog
 import com.example.myhabitapp.ui.theme.HabitAppTheme
 import kotlinx.datetime.DayOfWeek
-import kotlinx.datetime.LocalDate
 import myhabitapp.shared.generated.resources.Res
 import myhabitapp.shared.generated.resources.calendar
 import org.jetbrains.compose.resources.painterResource
@@ -61,7 +61,8 @@ fun EditCreateHabitScreen(
     showDateDialogPicker: () -> Unit,
     onSaveHabit: () -> Unit,
     onDismissDateDialog: () -> Unit,
-    onDismissTimeDialog: () -> Unit
+    onDismissTimeDialog: () -> Unit,
+    onHabitDelete: () -> Unit
 ) {
     Column(modifier = modifier) {
         Text(
@@ -291,6 +292,17 @@ fun EditCreateHabitScreen(
                 color = MaterialTheme.colorScheme.onPrimary
             )
         }
+        if (!uiState.createNote) {
+            Text(
+                text = "Delete note",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.primaryContainer,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(onClick = onHabitDelete)
+            )
+        }
     }
     if (uiState.dateDialogShown) {
         SetDateDialog(
@@ -327,7 +339,8 @@ fun CreateHabitScreenPreview() {
             onSaveHabit = { },
             onReminderChanged = {  },
             onDismissDateDialog = {  },
-            onDismissTimeDialog = {  }
+            onDismissTimeDialog = {  },
+            onHabitDelete = {  }
         )
     }
 }

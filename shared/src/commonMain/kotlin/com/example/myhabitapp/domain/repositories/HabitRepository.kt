@@ -10,6 +10,6 @@ interface HabitRepository {
     suspend fun getHabitById(habitId: Int?): Habit?
     suspend fun insertHabit(habit: Habit)
     suspend fun insertHabitRecord(habitRecord: HabitRecord)
-    suspend fun deleteHabit(habit: Habit)
+    suspend fun deleteHabit(habit: Habit?)
     suspend fun deleteHabitRecord(habitRecord: HabitRecord)
 }

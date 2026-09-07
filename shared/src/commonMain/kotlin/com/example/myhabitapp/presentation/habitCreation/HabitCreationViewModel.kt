@@ -3,11 +3,8 @@ package com.example.myhabitapp.presentation.habitCreation
 import androidx.compose.material3.TimePickerState
 import androidx.compose.material3.isInputValid
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.room3.ColumnInfo
 import com.example.myhabitapp.domain.models.Habit
 import com.example.myhabitapp.domain.repositories.HabitRepository
 import com.example.myhabitapp.presentation.utils.HabitColor
@@ -19,11 +16,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.DayOfWeek
-import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
-import kotlin.Boolean
-import kotlin.Int
-import kotlin.String
 
 class HabitCreationViewModel(
     val repository: HabitRepository,
@@ -237,6 +230,12 @@ class HabitCreationViewModel(
                 reminderDialogShown = false,
                 getReminders = false
             )
+        }
+    }
+
+    fun onHabitDelete() {
+        viewModelScope.launch {
+            repository.deleteHabit(habit.value)
         }
     }
 }

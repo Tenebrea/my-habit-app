@@ -5,17 +5,10 @@ import com.example.myhabitapp.domain.models.Habit
 import com.example.myhabitapp.domain.models.HabitRecord
 import com.example.myhabitapp.domain.repositories.HabitRepository
 import com.example.myhabitapp.presentation.mainScreen.getCurrentDate
-import kotlinx.coroutines.GlobalScope.coroutineContext
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.compose
-import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
-import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.minus
-import kotlin.coroutines.coroutineContext
 
 class HabitRepositoryImpl(private val habitDao: HabitDao) : HabitRepository {
     override suspend fun getHabits(): Flow<List<Habit>> {
@@ -62,8 +55,10 @@ class HabitRepositoryImpl(private val habitDao: HabitDao) : HabitRepository {
         habitDao.insertHabitRecord(habitRecord)
     }
 
-    override suspend fun deleteHabit(habit: Habit) {
-        habitDao.deleteHabit(habit)
+    override suspend fun deleteHabit(habit: Habit?) {
+        if (habit != null) {
+            habitDao.deleteHabit(habit)
+        }
     }
 
     override suspend fun deleteHabitRecord(habitRecord: HabitRecord) {
