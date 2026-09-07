@@ -80,11 +80,13 @@ class HabitCreationViewModel(
         }
     }
 
-    fun onGoalAmountChanged(newGoalAmount: Int) {
-        _uiState.update {
-            it.copy(
-                goalNumber = newGoalAmount
-            )
+    fun onGoalAmountChanged(newGoalAmount: String) {
+        if (newGoalAmount.all { it.isDigit() }) {
+            _uiState.update {
+                it.copy(
+                    goalNumber = newGoalAmount.toInt()
+                )
+            }
         }
     }
 

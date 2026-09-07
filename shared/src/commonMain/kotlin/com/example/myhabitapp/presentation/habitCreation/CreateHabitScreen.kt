@@ -53,7 +53,7 @@ fun EditCreateHabitScreen(
     onNameChanged: (String) -> Unit,
     onDateChanged: (Long?) -> Unit,
     onReminderChanged: (TimePickerState) -> Unit,
-    onGoalAmountChanged: (Int) -> Unit,
+    onGoalAmountChanged: (String) -> Unit,
     onToggleWeekDay: (DayOfWeek) -> Unit,
     toggleSetGoal: (Boolean) -> Unit,
     toggleRepeatDays: (Boolean) -> Unit,
@@ -149,13 +149,13 @@ fun EditCreateHabitScreen(
                 elevation = CardDefaults.cardElevation(6.dp),
                 modifier = Modifier
                     .weight(1f)
-                    .clickable(onClick = { showDateDialogPicker() })
+                    .clickable(onClick = { if (uiState.goalEnabled) showDateDialogPicker() })
                     .semantics { if (uiState.endDate == null) contentDescription = "Pick end date" }
             ){
                 Box(contentAlignment = Alignment.CenterStart) {
                     TextField(
                         value =
-                            if (uiState.endDate != null) "${uiState.endDate.day} ${uiState.endDate.month.name} ${uiState.endDate.year}"
+                            if (uiState.endDate != null) "${uiState.endDate.day}/${uiState.endDate.month.ordinal}/${uiState.endDate.year}"
                             else "",
                         onValueChange = {},
                         singleLine = true,
@@ -191,7 +191,7 @@ fun EditCreateHabitScreen(
                 Box(contentAlignment = Alignment.CenterStart) {
                     TextField(
                         value = if (uiState.goalNumber != null) uiState.goalNumber.toString() else "",
-                        onValueChange = { onGoalAmountChanged(it.toInt()) },
+                        onValueChange = { onGoalAmountChanged(it) },
                         singleLine = true,
                         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                         shape = RoundedCornerShape(24.dp),
@@ -200,7 +200,7 @@ fun EditCreateHabitScreen(
                             disabledContainerColor = MaterialTheme.colorScheme.surface
                         ),
                         modifier = Modifier.fillMaxWidth(),
-                        enabled = false
+                        enabled = uiState.goalEnabled
                     )
                     if (uiState.goalNumber == null) {
                         Text(
@@ -243,7 +243,7 @@ fun EditCreateHabitScreen(
             DayOfWeek.entries.forEach { dayOfWeek ->
                 SelectableCircle(
                     modifier = Modifier
-                        .clickable(onClick = { onToggleWeekDay(dayOfWeek) })
+                        .clickable(onClick = { if (uiState.repeatable) onToggleWeekDay(dayOfWeek) })
                         .size(48.dp),
                     selected = dayOfWeek in uiState.repeatDays,
                     text = dayOfWeek.name[0].toString(),
