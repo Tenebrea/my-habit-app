@@ -11,9 +11,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.datetime.DateTimeUnit
-import kotlinx.datetime.minus
-import kotlinx.datetime.plus
 
 class MainScreenViewModel(
     val repository: HabitRepository
@@ -90,7 +87,6 @@ class MainScreenViewModel(
             }
         }
     }
-
     private suspend fun addStreak(habit: Habit) {
         val newHabit = habit.copy(streak = habit.streak+1)
         repository.insertHabit(newHabit)

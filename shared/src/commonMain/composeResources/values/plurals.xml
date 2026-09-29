@@ -1,0 +1,6 @@
+<resources>
+    <plurals name="points">
+        <item quantity="one">point</item>
+        <item quantity="other">points</item>
+    </plurals>
+</resources>
