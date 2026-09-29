@@ -39,6 +39,10 @@ class HabitRepositoryImpl(private val habitDao: HabitDao) : HabitRepository {
         return habitDao.getHabitRecordsByHabitId(id)
     }
 
+    override suspend fun getHabitRecordsFlowByHabitId(id: Int): Flow<List<HabitRecord>> {
+        return habitDao.getHabitRecordsFlowByHabitId(id)
+    }
+
     override suspend fun getHabitById(habitId: Int?): Habit? {
         return if (habitId == null) {
             null
