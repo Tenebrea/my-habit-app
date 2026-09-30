@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -12,33 +13,57 @@ import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.layer.drawLayer
+import androidx.compose.ui.graphics.rememberGraphicsLayer
+import androidx.compose.ui.platform.ClipEntry
+import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.example.myhabitapp.presentation.habitSummary.components.HabitProgressBar
+import com.example.myhabitapp.presentation.habitSummary.utils.bitmapToPng
 import com.example.myhabitapp.presentation.utils.HabitColor
+import com.example.myhabitapp.ui.theme.HabitAppTheme
+import kotlinx.coroutines.launch
+import multiplatform.network.cmptoast.ToastDuration
+import multiplatform.network.cmptoast.showToast
 import myhabitapp.shared.generated.resources.Res
 import myhabitapp.shared.generated.resources.points
 import org.jetbrains.compose.resources.pluralStringResource
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun HabitSummaryScreen(
     uiState: SummaryUiState,
-    onShare: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val coroutineScope = rememberCoroutineScope()
+    val graphicsLayer = rememberGraphicsLayer()
+    val clipboard = LocalClipboard.current
+
     Column(modifier = modifier) {
         Text(
             text = "Your progress and insights",
             style = MaterialTheme.typography.displayLarge,
             color = MaterialTheme.colorScheme.onBackground,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .drawWithContent {
+                    graphicsLayer.record {
+                        this@drawWithContent.drawContent()
+                    }
+                    drawLayer(graphicsLayer)
+                }
         )
         Row(
             modifier = Modifier
@@ -58,9 +83,20 @@ fun HabitSummaryScreen(
         BottomPanel(
             modifier = Modifier.weight(2f),
             points = uiState.totalPoints,
-            onShare = onShare
+            onShare = {
+                coroutineScope.launch {
+                    clipboard.setClipEntry(
+                        graphicsLayer.toImageBitmap().bitmapToPng()?.let { ClipEntry(it) }
+                    )
+                    showToast(
+                        message = "Your results copied into clipboard",
+                        backgroundColor = Color.White,
+                        textColor = Color.Black,
+                        duration = ToastDuration.Short
+                    )
+                }
+            }
         )
-
     }
 }
 
@@ -99,23 +135,30 @@ fun BottomPanel(
     onShare: () -> Unit
 ) {
     Column(
+        verticalArrangement = Arrangement.SpaceBetween,
         modifier = modifier
-            .background(color = MaterialTheme.colorScheme.surface)
             .clip(shape = RoundedCornerShape(topStart = 45.dp, topEnd = 45.dp))
+            .background(color = MaterialTheme.colorScheme.surface)
+            .padding(12.dp)
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(8.dp)
+            modifier = Modifier
+                .fillMaxWidth()
         ) {
-            Column(modifier = Modifier.weight(1f)) {
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+            ) {
                 Text(
                     text = "Points Earned",
-                    style = MaterialTheme.typography.displayMedium,
+                    style = MaterialTheme.typography.displaySmall,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
                     text = "For this week",
-                    style = MaterialTheme.typography.displaySmall,
-                    color = MaterialTheme.colorScheme.onSurface
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(bottom = 12.dp)
                 )
             }
             Text(
@@ -126,7 +169,7 @@ fun BottomPanel(
                         fontStyle = MaterialTheme.typography.displayMedium.fontStyle,
                         color = MaterialTheme.colorScheme.primary)
                     ) {
-                        append(points.toString())
+                        append("$points ")
                     }
                     append(pluralStringResource(Res.plurals.points, quantity = points))
                 },
@@ -149,5 +192,16 @@ fun BottomPanel(
                 textAlign = TextAlign.Center
             )
         }
+    }
+}
+
+@PreviewLightDark
+@Composable
+fun SummaryScreenPreview() {
+    HabitAppTheme {
+        HabitSummaryScreen(
+            uiState = SummaryUiState(),
+            modifier = Modifier.fillMaxSize().background(color = Color.White)
+        )
     }
 }

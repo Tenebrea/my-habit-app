@@ -70,6 +70,7 @@ kotlin {
 
             implementation(libs.kotlinx.datetime)
             implementation(libs.adaptive.layout)
+            implementation(libs.cmptoast)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

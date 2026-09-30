@@ -67,6 +67,7 @@ koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", ver
 #Utils
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version = "0.8.0" }
 adaptive-layout = { module = "org.jetbrains.compose.material3.adaptive:adaptive", version = "1.2.0" }
+cmptoast = { module = "network.chaintech:cmptoast", version = "1.0.8" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

@@ -48,22 +48,20 @@ fun HabitNavGraph(
                     Row(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(12.dp)
                     ) {
                         MainHabitRoute(
                             imageSize = 32.dp,
                             onAddHabit = { navController.navigate(NavRoutes.Create) },
                             onEditHabit = { habitId -> navController.navigate(NavRoutes.Edit(habitId)) },
-                            modifier = Modifier.weight(1f),
+                            modifier = Modifier.weight(1f).padding(end = 12.dp),
                             viewModel = koinViewModel(),
                             fabVisible = true
                         )
                         HabitSummaryScreen(
                             uiState = uiState,
-                            onShare = { viewModel.onShare() },
                             modifier = Modifier
                                 .fillMaxHeight()
-                                .padding(8.dp)
+                                .padding(top = 8.dp, start = 8.dp, end = 8.dp)
                                 .weight(1f)
                         )
                     }
@@ -111,7 +109,6 @@ fun HabitNavGraph(
                         )
                         HabitSummaryScreen(
                             uiState = summaryUiState,
-                            onShare = { summaryViewModel.onShare() },
                             modifier = Modifier
                                 .fillMaxHeight()
                                 .padding(8.dp)
@@ -174,7 +171,6 @@ fun HabitNavGraph(
                         )
                         HabitSummaryScreen(
                             uiState = uiState,
-                            onShare = { viewModel.onShare() },
                             modifier = Modifier
                                 .fillMaxHeight()
                                 .padding(8.dp)
@@ -223,7 +219,6 @@ fun HabitNavGraph(
                         )
                         HabitSummaryScreen(
                             uiState = summaryUiState,
-                            onShare = { summaryViewModel.onShare() },
                             modifier = Modifier
                                 .fillMaxHeight()
                                 .padding(8.dp)

@@ -10,6 +10,31 @@ fun getAmountOfWeekDays(
     date: LocalDate,
     weekDays: List<DayOfWeek>
 ) : Int {
+    if (weekDays.isEmpty()) {
+        when (date.month) {
+            Month.FEBRUARY -> {
+                return if (date.year % 4 == 0) {
+                    if (date.year % 100 == 0) {
+                        if (date.year % 400 == 0) {
+                            29
+                        } else {
+                            28
+                        }
+                    } else {
+                        28
+                    }
+                } else {
+                    28
+                }
+            }
+            Month.JANUARY, Month.MARCH, Month.MAY, Month.JULY, Month.AUGUST, Month.OCTOBER, Month.DECEMBER -> {
+                return 31
+            }
+            else -> {
+                return 30
+            }
+        }
+    }
     when (date.month) {
         Month.FEBRUARY -> {
             if (date.year % 4 == 0) {

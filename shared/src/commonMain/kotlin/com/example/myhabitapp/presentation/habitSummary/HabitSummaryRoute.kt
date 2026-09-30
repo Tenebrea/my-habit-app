@@ -27,8 +27,7 @@ fun HabitSummaryRoute(
         )
         HabitSummaryScreen(
             modifier = Modifier.fillMaxSize(),
-            uiState = uiState,
-            onShare = { viewModel.onShare() }
+            uiState = uiState
         )
     }
 }

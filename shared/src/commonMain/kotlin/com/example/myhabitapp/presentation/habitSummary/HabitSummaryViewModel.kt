@@ -44,9 +44,7 @@ class HabitSummaryViewModel(
                                             val progress = it.completionProgress.toDouble()/(habit.numberGoal ?: 1)
                                             if (progress >= 1.0) 1.0 else progress
                                         }
-                                    val result = if (goal>0) progress/goal else 0.0
-
-                                    habit to result
+                                    habit to if (goal>0) progress/goal else 0.0
                                 }
                         }
                         combine(progressFlows) { pairs ->
@@ -56,14 +54,11 @@ class HabitSummaryViewModel(
                 }.collect { habitMap ->
                     _uiState.update { state ->
                         state.copy(
-                            habitsAndProgress = habitMap
+                            habitsAndProgress = habitMap,
+                            totalPoints = habitMap.values.sumOf { it*100 }.toInt()
                         )
                     }
                 }
         }
-    }
-
-    fun onShare() {
-        return
     }
 }
