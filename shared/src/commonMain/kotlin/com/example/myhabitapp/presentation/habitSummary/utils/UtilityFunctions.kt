@@ -1,5 +1,6 @@
 package com.example.myhabitapp.presentation.habitSummary.utils
 
+import androidx.compose.runtime.Composable
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
@@ -70,3 +71,10 @@ fun getAmountOfWeekDays(
         }
     }
 }
+
+interface PlatformShare {
+    fun shareImage(bytes: ByteArray, title: String = "Share Habit Progress")
+}
+
+@Composable
+expect fun rememberPlatformShare(): PlatformShare

@@ -2,6 +2,7 @@ package com.example.myhabitapp.presentation.habitSummary
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,8 +31,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import com.example.myhabitapp.di.platformModule
 import com.example.myhabitapp.presentation.habitSummary.components.HabitProgressBar
 import com.example.myhabitapp.presentation.habitSummary.utils.bitmapToPng
+import com.example.myhabitapp.presentation.habitSummary.utils.rememberPlatformShare
 import com.example.myhabitapp.presentation.utils.HabitColor
 import com.example.myhabitapp.ui.theme.HabitAppTheme
 import kotlinx.coroutines.launch
@@ -45,58 +48,73 @@ import org.jetbrains.compose.resources.pluralStringResource
 @Composable
 fun HabitSummaryScreen(
     uiState: SummaryUiState,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    backgroundColor: Color = MaterialTheme.colorScheme.background
 ) {
     val coroutineScope = rememberCoroutineScope()
     val graphicsLayer = rememberGraphicsLayer()
-    val clipboard = LocalClipboard.current
+    val platformShare = rememberPlatformShare()
 
-    Column(modifier = modifier) {
-        Text(
-            text = "Your progress and insights",
-            style = MaterialTheme.typography.displayLarge,
-            color = MaterialTheme.colorScheme.onBackground,
-            modifier = Modifier
-                .fillMaxWidth()
-                .drawWithContent {
-                    graphicsLayer.record {
-                        this@drawWithContent.drawContent()
-                    }
-                    drawLayer(graphicsLayer)
+    Box(
+        modifier = modifier
+            .background(backgroundColor)
+            .drawWithContent {
+                graphicsLayer.record {
+                    this@drawWithContent.drawContent()
                 }
-        )
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(3f)
+                drawLayer(graphicsLayer)
+            }
+    ) {
+        Column(
+            modifier = Modifier.background(backgroundColor)
         ) {
-            uiState.habitsAndProgress.forEach { (habit, f) ->
-                HabitProgressBarWithLabel(
-                    modifier = Modifier.weight(1f),
-                    color = HabitColor.entries[habit.color].color,
-                    progress = f,
-                    vertical = true,
-                    habitName = habit.name
-                )
-            }
-        }
-        BottomPanel(
-            modifier = Modifier.weight(2f),
-            points = uiState.totalPoints,
-            onShare = {
-                coroutineScope.launch {
-                    clipboard.setClipEntry(
-                        graphicsLayer.toImageBitmap().bitmapToPng()?.let { ClipEntry(it) }
-                    )
-                    showToast(
-                        message = "Your results copied into clipboard",
-                        backgroundColor = Color.White,
-                        textColor = Color.Black,
-                        duration = ToastDuration.Short
+            Text(
+                text = "Your progress and insights",
+                style = MaterialTheme.typography.displayLarge,
+                color = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier
+                    .fillMaxWidth()
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(3f)
+            ) {
+                uiState.habitsAndProgress.forEach { (habit, f) ->
+                    HabitProgressBarWithLabel(
+                        modifier = Modifier.weight(1f).padding(start = 4.dp),
+                        color = HabitColor.entries[habit.color].color,
+                        progress = f,
+                        vertical = true,
+                        habitName = habit.name
                     )
                 }
             }
-        )
+            BottomPanel(
+                modifier = Modifier.weight(2f),
+                points = uiState.totalPoints,
+                onShare = {
+                    coroutineScope.launch {
+                        val pngBytes = graphicsLayer.toImageBitmap().bitmapToPng()
+
+                        if (pngBytes != null) {
+                            platformShare.shareImage(
+                                bytes = pngBytes,
+                                title = "My Habit Summary"
+                            )
+                        } else {
+                            showToast(
+                                "Failed to capture image",
+                                backgroundColor = Color.White,
+                                textColor = Color.Black,
+                                duration = ToastDuration.Short
+                            )
+
+                        }
+                    }
+                }
+            )
+        }
     }
 }
 
