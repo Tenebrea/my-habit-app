@@ -7,5 +7,6 @@ import org.koin.dsl.module
 
 actual val platformModule = module {
     single { getHabitDb() }
-    single { (trayState: TrayState) -> ReminderScheduler(trayState) }
+    single<TrayState> { TrayState() }
+    single { ReminderScheduler(get()) }
 }

@@ -73,7 +73,8 @@ class ReminderWorker(
         days: List<DayOfWeek>,
         time: LocalTime
     ): LocalDateTime = now.let { adjustedDay ->
-        var result = LocalDateTime(time = time, date = adjustedDay.date)
+        val result = LocalDateTime(time = time, date = adjustedDay.date)
+        val days = days.ifEmpty { DayOfWeek.entries }
         val dayDif = when {
             (result.dayOfWeek in days) && (now.time < time) -> 0
             days.any { it.ordinal > result.dayOfWeek.ordinal } ->

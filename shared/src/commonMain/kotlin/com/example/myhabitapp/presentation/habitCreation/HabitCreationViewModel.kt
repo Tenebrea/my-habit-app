@@ -136,7 +136,7 @@ class HabitCreationViewModel(
         _uiState.update {
             it.copy(
                 getReminders = newState,
-                reminderDialogShown = true
+                reminderDialogShown = newState
             )
         }
     }
@@ -185,38 +185,36 @@ class HabitCreationViewModel(
                 repeatDays = _uiState.value.repeatDays,
                 reminderTime = _uiState.value.reminder,
                 numberGoal = _uiState.value.goalNumber,
-            ) ?: Habit(
-                id = 0,
-                name = _uiState.value.habitName,
-                endDate = _uiState.value.endDate,
-                repeatDays = _uiState.value.repeatDays,
-                reminderTime = _uiState.value.reminder,
-                numberGoal = _uiState.value.goalNumber,
-                color = HabitColor.entries.random().ordinal,
-                icon = HabitIcon.entries.random().ordinal,
-                streak = 0
-            )
+            ) ?: return
 
             viewModelScope
-                .launch(Dispatchers.IO) { repository.insertHabit(newHabit) }
-            _uiState.update {
-                it.copy(
-                    habitName = "",
-                    goalEnabled = false,
-                    endDate = null,
-                    goalNumber = null,
-                    reminder = null,
-                    repeatable = false,
-                    repeatDays = emptyList(),
-                    getReminders = false,
-                    createNote = true,
-                    dateDialogShown = false,
-                    reminderDialogShown = false,
-                    emptyNameError = false,
-                    emptyGoalsError = false,
-                    emptyRepeatDaysError = false
-                )
-            }
+                .launch(Dispatchers.IO) {
+                    repository.insertHabit(newHabit)
+                    if (newHabit.reminderTime != null) {
+                        updateReminder(newHabit)
+                    } else {
+                        removeReminder(newHabit)
+                    }
+                    _uiState.update {
+                        it.copy(
+                            habitName = "",
+                            goalEnabled = false,
+                            endDate = null,
+                            goalNumber = null,
+                            reminder = null,
+                            repeatable = false,
+                            repeatDays = emptyList(),
+                            getReminders = false,
+                            createNote = true,
+                            dateDialogShown = false,
+                            reminderDialogShown = false,
+                            emptyNameError = false,
+                            emptyGoalsError = false,
+                            emptyRepeatDaysError = false
+                        )
+                    }
+                }
+
         }
     }
 
@@ -240,6 +238,29 @@ class HabitCreationViewModel(
     fun onHabitDelete() {
         viewModelScope.launch {
             repository.deleteHabit(habit.value)
+            removeReminder()
+        }
+    }
+
+    private fun updateReminder(thisHabit: Habit? = null) {
+        if (thisHabit != null) {
+            reminderRepository.createReminder(thisHabit)
+            return
+        }
+        val habit = habit.value
+        if (habit != null) {
+            reminderRepository.createReminder(habit)
+        }
+    }
+
+    private fun removeReminder(thisHabit: Habit? = null) {
+        if (thisHabit != null) {
+            reminderRepository.removeReminder(thisHabit)
+            return
+        }
+        val habit = habit.value
+        if (habit != null) {
+            reminderRepository.removeReminder(habit)
         }
     }
 }

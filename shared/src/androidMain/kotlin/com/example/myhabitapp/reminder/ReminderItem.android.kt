@@ -33,7 +33,7 @@ actual class ReminderScheduler(private val context: Context) {
             .build()
 
         workManager.enqueueUniqueWork(
-            "${reminder.title}_${reminder.id}",
+            reminder.id,
             ExistingWorkPolicy.REPLACE,
             workRequest
         )
@@ -48,7 +48,8 @@ actual class ReminderScheduler(private val context: Context) {
         days: List<DayOfWeek>,
         time: LocalTime
     ): LocalDateTime = now.let { adjustedDay ->
-        var result = LocalDateTime(time = time, date = adjustedDay.date)
+        val result = LocalDateTime(time = time, date = adjustedDay.date)
+        val days = days.ifEmpty { DayOfWeek.entries }
         val dayDif = when {
             (result.dayOfWeek in days) && (now.time < time) -> 0
             days.any { it.ordinal > result.dayOfWeek.ordinal } ->

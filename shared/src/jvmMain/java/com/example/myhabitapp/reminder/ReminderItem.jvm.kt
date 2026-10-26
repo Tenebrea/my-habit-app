@@ -9,6 +9,8 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.plus
 import kotlinx.datetime.toJavaLocalDateTime
+import java.time.Instant
+import java.time.ZoneId
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledFuture
@@ -23,20 +25,19 @@ actual class ReminderScheduler(private val trayState: TrayState) {
     private val scheduledTasks = ConcurrentHashMap<String, ScheduledFuture<*>>()
 
     actual fun scheduleReminder(reminder: com.example.myhabitapp.reminder.ReminderItem) {
-        val currentDate = getCurrentDate()
-        val currentTime = System.currentTimeMillis()
+        val now = java.time.LocalDateTime.now()
         val currentDateTime = LocalDateTime(
-            date = currentDate,
-            time = LocalTime(hour = currentTime.hours.toInt(DurationUnit.HOURS), minute = currentTime.minutes.toInt(DurationUnit.MINUTES))
+            date = getCurrentDate(),
+            time = LocalTime(hour = now.hour, minute = now.minute, second = now.second)
         )
 
         val dateNeeded = calculateNextRun(currentDateTime, reminder.repeatDays, reminder.time)
 
+        val nowEpochSecond = Instant.now().epochSecond
+        val targetEpochSecond = dateNeeded.toJavaLocalDateTime().atZone(ZoneId.systemDefault()).toEpochSecond()
+        val delaySeconds = maxOf(0L, targetEpochSecond - nowEpochSecond)
 
-        val delaySeconds =
-            dateNeeded.toJavaLocalDateTime().toEpochSecond(java.time.ZoneOffset.UTC) - System.currentTimeMillis().seconds.toInt(
-                DurationUnit.SECONDS)
-        cancelReminder("${reminder.title}_${reminder.id}")
+        cancelReminder(reminder.id)
 
         val future = executor.schedule({
             try {
@@ -46,14 +47,13 @@ actual class ReminderScheduler(private val trayState: TrayState) {
                     Notification.Type.Info
                 )
                 trayState.sendNotification(notification)
-                scheduleReminder(reminder)
             } finally {
-                scheduledTasks.remove("${reminder.title}_${reminder.id}")
+                scheduledTasks.remove(reminder.id)
                 scheduleReminder(reminder)
             }
         }, delaySeconds, TimeUnit.SECONDS)
 
-        scheduledTasks["${reminder.title}_${reminder.id}"] = future
+        scheduledTasks[reminder.id] = future
     }
 
     actual fun cancelReminder(reminderId: String) {
@@ -67,12 +67,12 @@ actual class ReminderScheduler(private val trayState: TrayState) {
         time: LocalTime
     ): LocalDateTime = now.let { adjustedDay ->
         val result = LocalDateTime(time = time, date = adjustedDay.date)
+        val days = days.ifEmpty { DayOfWeek.entries }
         val dayDif = when {
             (result.dayOfWeek in days) && (now.time < time) -> 0
             days.any { it.ordinal > result.dayOfWeek.ordinal } ->
                 days.filter { it.ordinal > result.dayOfWeek.ordinal }
                     .min().ordinal - result.dayOfWeek.ordinal
-
             else -> days.min().ordinal + DayOfWeek.entries.size - result.dayOfWeek.ordinal
         }
         result.apply {

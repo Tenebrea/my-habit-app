@@ -29,6 +29,6 @@ class ReminderRepositoryImpl(
     }
 
     override fun removeReminder(habit: Habit) {
-        reminderScheduler.cancelReminder("${habit.name}_${habit.id}")
+        reminderScheduler.cancelReminder(habit.id.toString())
     }
 }
