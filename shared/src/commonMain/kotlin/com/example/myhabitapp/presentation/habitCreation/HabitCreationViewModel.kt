@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myhabitapp.domain.models.Habit
 import com.example.myhabitapp.domain.repositories.HabitRepository
+import com.example.myhabitapp.domain.repositories.ReminderRepository
 import com.example.myhabitapp.presentation.utils.HabitColor
 import com.example.myhabitapp.presentation.utils.HabitIcon
 import com.example.myhabitapp.presentation.utils.toLocalDate
@@ -19,8 +20,9 @@ import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalTime
 
 class HabitCreationViewModel(
-    val repository: HabitRepository,
-    val habitId: Int?,
+    private val repository: HabitRepository,
+    private val reminderRepository: ReminderRepository,
+    private val habitId: Int?,
 ) : ViewModel() {
     private val _uiState: MutableStateFlow<CreateHabitUiState> =
         MutableStateFlow(CreateHabitUiState())

@@ -18,8 +18,8 @@ import kotlinx.datetime.LocalDate
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class HabitSummaryViewModel(
-    val repository: HabitRepository,
-    val currentDate: LocalDate
+    private val repository: HabitRepository,
+    private val currentDate: LocalDate
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(SummaryUiState())
     val uiState = _uiState.asStateFlow()
